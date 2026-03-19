@@ -1,9 +1,9 @@
 {
   "manifest_version": 3,
-  "name": "Dịch Nhật-Việt (Bằng Gemini)",
-  "version": "1.0",
+  "name": "Dịch sang tiếng Việt",
+  "version": "1.1",
   "author": "trunglt",
-  "description": "Giữ Alt + click vào phần tử để dịch tiếng Nhật sang tiếng Việt bằng Gemini. Ban quyen va quyen so huu: trunglt.",
+  "description": "Giữ Alt + click vào phần tử để dịch sang tiếng Việt. Bản quyền thuộc về trunglt.",
   "permissions": [
     "storage",
     "activeTab"
@@ -14,16 +14,16 @@
     "<all_urls>"
   ],
   "icons": {
-    "16": "favicon.ico",
-    "32": "favicon.ico",
-    "48": "favicon.ico",
-    "128": "favicon.ico"
+    "16": "icon_16x16.png",
+    "32": "icon_32x32.png",
+    "48": "icon_48x48.png",
+    "128": "icon_128x128.png"
   },
   "action": {
     "default_popup": "popup.html",
     "default_icon": {
-      "16": "favicon.ico",
-      "32": "favicon.ico"
+      "16": "icon_16x16.png",
+      "32": "icon_32x32.png"
     }
   },
   "content_scripts": [
