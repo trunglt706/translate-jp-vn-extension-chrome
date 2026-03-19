@@ -1,4 +1,7 @@
 // === CẤU HÌNH GEMINI API ===
+const MAX_TEXT_LENGTH = 200; // Giới hạn ký tự gửi dịch
+const TRANSLATE_COOLDOWN_MS = 1500; // Thời gian chờ giữa 2 lần dịch (ms)
+let isTranslating = false;
 const GEMINI_API_BASE = 'https://generativelanguage.googleapis.com';
 const GEMINI_API_VERSION = 'v1';
 const GEMINI_MODELS = [
@@ -38,7 +41,7 @@ async function translateWithGemini(text, apiKey) {
   const requestBody = {
     contents: [{
       parts: [{
-        text: `Dịch đoạn văn bản tiếng Nhật sau đây sang tiếng Việt. Chỉ trả về bản dịch, không giải thích gì thêm: "${text}"`
+        text: `Dịch đoạn văn bản sau đây sang tiếng Việt. Chỉ trả về bản dịch, không giải thích gì thêm: "${text}"`
       }]
     }],
     generationConfig: {
@@ -70,7 +73,7 @@ async function translateWithGemini(text, apiKey) {
 async function translateWithChatGPT(text, apiKey) {
   if (!text || text.trim().length < 2) return null;
 
-  const prompt = `Translate this Japanese text to Vietnamese. Only return the translation: "${text}"`;
+  const prompt = `Translate this text to Vietnamese. Only return the translation: "${text}"`;
 
   try {
     const response = await fetch(OPENAI_API_URL, {
@@ -157,12 +160,21 @@ function getTextFromEventTarget(event) {
 // === XỬ LÝ SỰ KIỆN CLICK ===
 document.addEventListener('click', async function(event) {
   // Giữ phím Alt + Click để dịch
-  if (!event.altKey) return; 
+  if (!event.altKey) return;
+
+  if (isTranslating) return; // Chặn click liên tục
 
   const clickedElement = event.target;
-  const originalText = getTextFromEventTarget(event);
+  const rawText = getTextFromEventTarget(event);
 
-  if (!originalText || originalText.trim().length === 0) return;
+  if (!rawText || rawText.trim().length === 0) return;
+
+  // Giới hạn độ dài văn bản gửi đi
+  const originalText = rawText.trim().length > MAX_TEXT_LENGTH
+    ? rawText.trim().slice(0, MAX_TEXT_LENGTH) + '…'
+    : rawText.trim();
+
+  isTranslating = true;
 
   chrome.storage.local.get(['translator_provider', 'gemini_api_key', 'openai_api_key'], async (result) => {
     const provider = result.translator_provider || 'gemini';
@@ -184,9 +196,11 @@ document.addEventListener('click', async function(event) {
 
     if (translatedText) {
       const providerLabel = provider === 'chatgpt' ? 'ChatGPT' : 'Gemini';
-      alert(`[${providerLabel} Dịch]:\n----------\n${translatedText}`);
+      const truncated = rawText.trim().length > MAX_TEXT_LENGTH ? ` (đã cắt bớt còn ${MAX_TEXT_LENGTH} ký tự)` : '';
+      alert(`[${providerLabel} Dịch]${truncated}:\n----------\n${translatedText}`);
     }
 
     clickedElement.style.backgroundColor = oldBg;
+    setTimeout(() => { isTranslating = false; }, TRANSLATE_COOLDOWN_MS);
   });
 });
