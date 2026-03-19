@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+  <style>
+    body { width: 300px; padding: 15px; font-family: sans-serif; }
+    h3 { margin-top: 0; color: #4285f4; }
+    select,
+    input { width: 90%; padding: 8px; margin-bottom: 10px; border: 1px solid #ccc; border-radius: 4px; }
+    button { background-color: #4285f4; color: white; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+    .hint-link { display: inline-block; margin-bottom: 10px; font-size: 12px; }
+    #status { margin-top: 10px; font-size: 12px; }
+  </style>
+</head>
+<body>
+  <h3>Cấu hình API Dịch</h3>
+  <label for="provider">Nhà cung cấp:</label>
+  <select id="provider">
+    <option value="gemini">Gemini</option>
+    <option value="chatgpt">ChatGPT</option>
+  </select>
+  <label for="apiKey">Nhập API Key:</label>
+  <input type="password" id="apiKey" placeholder="AIza...">
+  <a class="hint-link" id="hintGemini" href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer">Lấy Gemini key: https://aistudio.google.com/api-keys</a>
+  <a class="hint-link" id="hintOpenAI" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" style="display:none;">Lấy OpenAI key: https://platform.openai.com/api-keys</a>
+  <button id="save">Lưu Key</button>
+  <div id="status"></div>
+  <script src="popup.js"></script>
+</body>
+</html>

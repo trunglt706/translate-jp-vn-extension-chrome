@@ -1,0 +1,35 @@
+{
+  "manifest_version": 3,
+  "name": "Dịch Nhật-Việt (Bằng Gemini)",
+  "version": "1.0",
+  "author": "trunglt",
+  "description": "Giữ Alt + click vào phần tử để dịch tiếng Nhật sang tiếng Việt bằng Gemini. Ban quyen va quyen so huu: trunglt.",
+  "permissions": [
+    "storage",
+    "activeTab"
+  ],
+  "host_permissions": [
+    "https://api.openai.com/*",
+    "https://generativelanguage.googleapis.com/*",
+    "<all_urls>"
+  ],
+  "icons": {
+    "16": "favicon.ico",
+    "32": "favicon.ico",
+    "48": "favicon.ico",
+    "128": "favicon.ico"
+  },
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "favicon.ico",
+      "32": "favicon.ico"
+    }
+  },
+  "content_scripts": [
+    {
+      "matches": ["<all_urls>"],
+      "js": ["content.js"]
+    }
+  ]
+}
