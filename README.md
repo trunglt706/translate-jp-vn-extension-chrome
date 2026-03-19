@@ -1,6 +1,6 @@
-# Translate JP-VN Extension
+# Translate To VN Extension
 
-Chrome extension for quickly translating Japanese text to Vietnamese using Gemini or ChatGPT.
+Chrome extension for quickly translating text to Vietnamese using Gemini or ChatGPT.
 
 ## Overview
 
