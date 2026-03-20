@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Dịch sang tiếng Việt",
-  "version": "1.1",
+  "version": "1.2",
   "author": "trunglt",
   "description": "Giữ Alt + click vào phần tử để dịch sang tiếng Việt. Bản quyền thuộc về trunglt.",
   "permissions": [

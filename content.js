@@ -159,6 +159,8 @@ function getTextFromEventTarget(event) {
 
 // === XỬ LÝ SỰ KIỆN CLICK ===
 document.addEventListener('click', async function(event) {
+  event.preventDefault();
+
   // Giữ phím Alt + Click để dịch
   if (!event.altKey) return;
 

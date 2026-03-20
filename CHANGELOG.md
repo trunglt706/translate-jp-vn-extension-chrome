@@ -5,6 +5,13 @@ Tất cả các thay đổi đáng chú ý của extension sẽ được ghi l�
 
 ---
 
+## [1.2] - 2026-03-20
+
+### Sửa lỗi
+- Ngăn không cho trình duyệt tải xuống hoặc mở trang khi nhấn tổ hợp **Alt + Click** vào thẻ `a[href]`, đảm bảo thao tác chỉ dùng để dịch.
+
+---
+
 ## [1.1] - 2026-03-19
 
 ### Thêm mới
