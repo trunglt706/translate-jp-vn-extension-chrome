@@ -5,6 +5,16 @@ Tất cả các thay đổi đáng chú ý của extension sẽ được ghi l�
 
 ---
 
+## [1.3] - 2026-03-20
+
+### Thêm mới
+- Chỉ kích hoạt dịch khi nhấn tổ hợp **Alt + Click** — các click thông thường không bị ảnh hưởng (`preventDefault` chỉ áp dụng khi có Alt).
+- Nếu người dùng **bôi chọn (select) văn bản** trước khi Alt + Click, chỉ dịch đúng đoạn đã chọn thay vì toàn bộ text của element; giới hạn 200 ký tự không áp dụng cho đoạn được chọn thủ công.
+- Lưu `Selection` và `Range` tại `mousedown` để tránh mất selection khi trình duyệt xử lý click.
+- Hiệu ứng highlight thông minh: nếu có selection thì tô màu nền (`#e8f0fe`) đúng trên **đoạn text đã chọn** bằng thẻ `<mark>` tạm thời; nếu không thì tô nền element như cũ.
+
+---
+
 ## [1.2] - 2026-03-20
 
 ### Sửa lỗi

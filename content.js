@@ -158,25 +158,75 @@ function getTextFromEventTarget(event) {
 }
 
 // === XỬ LÝ SỰ KIỆN CLICK ===
-document.addEventListener('click', async function(event) {
-  event.preventDefault();
+// Lưu selection và range trước khi click có thể xóa nó
+let _pendingSelection = '';
+let _pendingRange = null;
+document.addEventListener('mousedown', function(event) {
+  if (event.altKey) {
+    const sel = window.getSelection();
+    _pendingSelection = sel?.toString()?.trim() || '';
+    _pendingRange = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0).cloneRange() : null;
+  }
+});
 
-  // Giữ phím Alt + Click để dịch
+function applySelectionHighlight(range) {
+  if (!range) return null;
+  const mark = document.createElement('mark');
+  mark.style.cssText = 'background-color:#e8f0fe;color:inherit;';
+  try {
+    range.surroundContents(mark);
+  } catch {
+    // Selection trải qua nhiều element, dùng extractContents
+    mark.appendChild(range.extractContents());
+    range.insertNode(mark);
+  }
+  return mark;
+}
+
+function removeSelectionHighlight(mark) {
+  if (!mark || !mark.parentNode) return;
+  const parent = mark.parentNode;
+  while (mark.firstChild) parent.insertBefore(mark.firstChild, mark);
+  parent.removeChild(mark);
+  parent.normalize();
+}
+
+document.addEventListener('click', async function(event) {
+  // Chỉ xử lý khi nhấn Alt + Click
   if (!event.altKey) return;
+
+  event.preventDefault();
 
   if (isTranslating) return; // Chặn click liên tục
 
   const clickedElement = event.target;
-  const rawText = getTextFromEventTarget(event);
+
+  // Ưu tiên text người dùng đã select; nếu không thì lấy text từ element
+  const selectedText = _pendingSelection;
+  const savedRange = _pendingRange;
+  _pendingSelection = '';
+  _pendingRange = null;
+  const rawText = selectedText || getTextFromEventTarget(event);
 
   if (!rawText || rawText.trim().length === 0) return;
 
-  // Giới hạn độ dài văn bản gửi đi
-  const originalText = rawText.trim().length > MAX_TEXT_LENGTH
+  // Nếu có selection thì dịch toàn bộ, không có thì giới hạn độ dài
+  const hasSelection = selectedText.length > 0;
+  const originalText = (!hasSelection && rawText.trim().length > MAX_TEXT_LENGTH)
     ? rawText.trim().slice(0, MAX_TEXT_LENGTH) + '…'
     : rawText.trim();
 
   isTranslating = true;
+
+  // Hiệu ứng đổi màu: nếu có selection thì tô đoạn selected, còn lại tô element
+  let highlightMark = null;
+  let oldBg = '';
+  if (hasSelection) {
+    highlightMark = applySelectionHighlight(savedRange);
+  } else {
+    oldBg = clickedElement.style.backgroundColor;
+    clickedElement.style.backgroundColor = '#e8f0fe';
+  }
 
   chrome.storage.local.get(['translator_provider', 'gemini_api_key', 'openai_api_key'], async (result) => {
     const provider = result.translator_provider || 'gemini';
@@ -185,12 +235,11 @@ document.addEventListener('click', async function(event) {
     if (!apiKey) {
       const providerName = provider === 'chatgpt' ? 'ChatGPT' : 'Gemini';
       alert(`Vui lòng dán ${providerName} API Key vào popup!`);
+      if (highlightMark) removeSelectionHighlight(highlightMark);
+      else clickedElement.style.backgroundColor = oldBg;
+      isTranslating = false;
       return;
     }
-
-    // Hiệu ứng đổi màu tạm thời để biết đang xử lý
-    const oldBg = clickedElement.style.backgroundColor;
-    clickedElement.style.backgroundColor = '#e8f0fe';
 
     const translatedText = provider === 'chatgpt'
       ? await translateWithChatGPT(originalText, apiKey)
@@ -198,11 +247,12 @@ document.addEventListener('click', async function(event) {
 
     if (translatedText) {
       const providerLabel = provider === 'chatgpt' ? 'ChatGPT' : 'Gemini';
-      const truncated = rawText.trim().length > MAX_TEXT_LENGTH ? ` (đã cắt bớt còn ${MAX_TEXT_LENGTH} ký tự)` : '';
+      const truncated = (!hasSelection && rawText.trim().length > MAX_TEXT_LENGTH) ? ` (đã cắt bớt còn ${MAX_TEXT_LENGTH} ký tự)` : '';
       alert(`[${providerLabel} Dịch]${truncated}:\n----------\n${translatedText}`);
     }
 
-    clickedElement.style.backgroundColor = oldBg;
+    if (highlightMark) removeSelectionHighlight(highlightMark);
+    else clickedElement.style.backgroundColor = oldBg;
     setTimeout(() => { isTranslating = false; }, TRANSLATE_COOLDOWN_MS);
   });
 });
