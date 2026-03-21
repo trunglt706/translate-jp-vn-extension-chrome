@@ -5,6 +5,19 @@ Tất cả các thay đổi đáng chú ý của extension sẽ được ghi l�
 
 ---
 
+## [1.4] - 2026-03-21
+
+### Thêm mới
+- Bổ sung setting chọn phím kết hợp với click trong popup: **Alt / Ctrl / Shift / Meta + Click**.
+- Lưu cấu hình hotkey vào `chrome.storage.local` với key `translator_click_hotkey` và tự động áp dụng ngay khi thay đổi.
+- Cập nhật luồng bắt sự kiện tại `content.js` để dùng hotkey đã cấu hình thay vì hardcode `Alt + Click`.
+
+### Thay đổi
+- Nút lưu trong popup đổi thành **Lưu cấu hình**; cho phép lưu provider + hotkey ngay cả khi không nhập lại API key.
+- Cập nhật tài liệu và mô tả extension để phản ánh hotkey có thể cấu hình.
+
+---
+
 ## [1.3] - 2026-03-20
 
 ### Thêm mới
