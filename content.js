@@ -11,6 +11,52 @@ const GEMINI_MODELS = [
 ];
 const OPENAI_API_URL = 'https://api.openai.com/v1/chat/completions';
 const OPENAI_MODEL = 'gpt-4o-mini';
+const DEFAULT_CLICK_HOTKEY = 'alt';
+const HOTKEY_STORAGE_KEY = 'translator_click_hotkey';
+
+let clickHotkey = DEFAULT_CLICK_HOTKEY;
+
+function normalizeHotkey(value) {
+  const allowed = ['alt', 'ctrl', 'shift', 'meta'];
+  return allowed.includes(value) ? value : DEFAULT_CLICK_HOTKEY;
+}
+
+function hotkeyLabel(value) {
+  switch (normalizeHotkey(value)) {
+    case 'ctrl':
+      return 'Ctrl';
+    case 'shift':
+      return 'Shift';
+    case 'meta':
+      return 'Meta';
+    case 'alt':
+    default:
+      return 'Alt';
+  }
+}
+
+function isHotkeyPressed(event) {
+  switch (clickHotkey) {
+    case 'ctrl':
+      return event.ctrlKey;
+    case 'shift':
+      return event.shiftKey;
+    case 'meta':
+      return event.metaKey;
+    case 'alt':
+    default:
+      return event.altKey;
+  }
+}
+
+chrome.storage.local.get([HOTKEY_STORAGE_KEY], (result) => {
+  clickHotkey = normalizeHotkey(result[HOTKEY_STORAGE_KEY]);
+});
+
+chrome.storage.onChanged.addListener((changes, areaName) => {
+  if (areaName !== 'local' || !changes[HOTKEY_STORAGE_KEY]) return;
+  clickHotkey = normalizeHotkey(changes[HOTKEY_STORAGE_KEY].newValue);
+});
 
 async function callGemini(model, requestBody, apiKey) {
   const url = `${GEMINI_API_BASE}/${GEMINI_API_VERSION}/models/${model}:generateContent?key=${apiKey}`;
@@ -162,7 +208,7 @@ function getTextFromEventTarget(event) {
 let _pendingSelection = '';
 let _pendingRange = null;
 document.addEventListener('mousedown', function(event) {
-  if (event.altKey) {
+  if (isHotkeyPressed(event)) {
     const sel = window.getSelection();
     _pendingSelection = sel?.toString()?.trim() || '';
     _pendingRange = (sel && sel.rangeCount > 0) ? sel.getRangeAt(0).cloneRange() : null;
@@ -192,8 +238,8 @@ function removeSelectionHighlight(mark) {
 }
 
 document.addEventListener('click', async function(event) {
-  // Chỉ xử lý khi nhấn Alt + Click
-  if (!event.altKey) return;
+  // Chỉ xử lý khi đúng hotkey đã cấu hình + click
+  if (!isHotkeyPressed(event)) return;
 
   event.preventDefault();
 
@@ -234,7 +280,7 @@ document.addEventListener('click', async function(event) {
 
     if (!apiKey) {
       const providerName = provider === 'chatgpt' ? 'ChatGPT' : 'Gemini';
-      alert(`Vui lòng dán ${providerName} API Key vào popup!`);
+      alert(`Vui lòng dán ${providerName} API Key vào popup! (Hotkey hiện tại: ${hotkeyLabel(clickHotkey)} + Click)`);
       if (highlightMark) removeSelectionHighlight(highlightMark);
       else clickedElement.style.backgroundColor = oldBg;
       isTranslating = false;

@@ -24,13 +24,20 @@
     <option value="gemini">Gemini</option>
     <option value="chatgpt">ChatGPT</option>
   </select>
+  <label for="clickHotkey">Phím kết hợp với click:</label>
+  <select id="clickHotkey">
+    <option value="alt">Alt + Click</option>
+    <option value="ctrl">Ctrl + Click</option>
+    <option value="shift">Shift + Click</option>
+    <option value="meta">Meta (Win/Cmd) + Click</option>
+  </select>
   <label for="apiKey">Nhập API Key:</label>
   <input type="password" id="apiKey" placeholder="AIza...">
   <a class="hint-link" id="hintGemini" href="https://aistudio.google.com/api-keys" target="_blank" rel="noopener noreferrer">Lấy Gemini key: https://aistudio.google.com/api-keys</a>
   <a class="hint-link" id="hintOpenAI" href="https://platform.openai.com/api-keys" target="_blank" rel="noopener noreferrer" style="display:none;">Lấy OpenAI key: https://platform.openai.com/api-keys</a>
-  <button id="save">💾 Lưu Key</button>
+  <button id="save">💾 Lưu cấu hình</button>
   <div id="status"></div>
-  <div class="usage-note">💡 Giữ <strong>Alt + click</strong> vào phần tử để dịch sang tiếng Việt.</div>
+  <div class="usage-note">💡 Giữ <strong id="usageHotkey">Alt</strong> + click vào phần tử để dịch sang tiếng Việt.</div>
   <script src="popup.js"></script>
 </body>
 </html>
